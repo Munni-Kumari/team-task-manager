@@ -1,4 +1,3 @@
-// backend/routes/projects.js
 const express = require("express");
 const db = require("../db");
 const auth = require("../middleware/auth");
@@ -11,17 +10,21 @@ router.post("/", auth, (req, res) => {
   db.query(
     "INSERT INTO projects (name, created_by) VALUES (?, ?)",
     [name, req.user.id],
-    (err) => {
-      if (err) return res.status(500).send(err);
-      res.send("Project created");
+    (err, result) => {
+      if (err) return res.status(500).json({ message: "Database error", error: err });
+      res.status(201).json({ message: "Project created", id: result.insertId });
     }
   );
 });
 
 router.get("/", auth, (req, res) => {
-  db.query("SELECT * FROM projects", (err, result) => {
-    res.json(result);
-  });
+  db.query(
+    "SELECT p.*, u.name as creator_name FROM projects p JOIN users u ON p.created_by = u.id",
+    (err, result) => {
+      if (err) return res.status(500).json({ message: "Database error", error: err });
+      res.json(result);
+    }
+  );
 });
 
 module.exports = router;
