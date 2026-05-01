@@ -1,10 +1,11 @@
 const express = require("express");
 const db = require("../db");
 const auth = require("../middleware/auth");
+const isAdmin = require("../middleware/isAdmin");
 
 const router = express.Router();
 
-router.post("/", auth, (req, res) => {
+router.post("/", auth, isAdmin, (req, res) => {
   const { title, assigned_to, project_id, due_date } = req.body;
 
   db.query(

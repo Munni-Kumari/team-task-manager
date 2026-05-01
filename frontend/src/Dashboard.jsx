@@ -91,12 +91,14 @@ export default function Dashboard() {
                   # {p.name}
                 </li>
               ))}
-              <li 
-                onClick={() => setShowProjectModal(true)}
-                style={{ padding: '0.75rem', marginTop: '0.5rem', borderRadius: '0.5rem', cursor: 'pointer', color: 'var(--primary)', fontWeight: '600' }}
-              >
-                + New Project
-              </li>
+              {user?.role === 'admin' && (
+                <li 
+                  onClick={() => setShowProjectModal(true)}
+                  style={{ padding: '0.75rem', marginTop: '0.5rem', borderRadius: '0.5rem', cursor: 'pointer', color: 'var(--primary)', fontWeight: '600' }}
+                >
+                  + New Project
+                </li>
+              )}
             </ul>
           </div>
         </nav>
@@ -124,9 +126,11 @@ export default function Dashboard() {
             <h2 style={{ fontSize: '1.875rem' }}>Project Dashboard</h2>
             <p style={{ color: 'var(--text-muted)' }}>Manage your team's progress and tasks</p>
           </div>
-          <Button onClick={() => setShowTaskModal(true)}>
-            + Create New Task
-          </Button>
+          {user?.role === 'admin' && (
+            <Button onClick={() => setShowTaskModal(true)}>
+              + Create New Task
+            </Button>
+          )}
         </header>
 
         {/* Stats */}
