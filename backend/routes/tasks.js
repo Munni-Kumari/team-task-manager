@@ -31,14 +31,24 @@ router.get("/", auth, (req, res) => {
 router.put("/:id", auth, (req, res) => {
   const { status, title, due_date } = req.body;
   
-  db.query(
-    "UPDATE tasks SET status=COALESCE(?, status), title=COALESCE(?, title), due_date=COALESCE(?, due_date) WHERE id=?",
-    [status, title, due_date, req.params.id],
-    (err) => {
-      if (err) return res.status(500).json({ message: "Database error", error: err });
-      res.json({ message: "Task updated" });
+  db.query("SELECT assigned_to FROM tasks WHERE id = ?", [req.params.id], (err, result) => {
+    if (err) return res.status(500).json({ message: "Database error", error: err });
+    if (result.length === 0) return res.status(404).json({ message: "Task not found" });
+
+    const task = result[0];
+    if (req.user.role !== "admin" && req.user.id !== task.assigned_to) {
+      return res.status(403).json({ message: "You are not authorized to update this task" });
     }
-  );
+
+    db.query(
+      "UPDATE tasks SET status=COALESCE(?, status), title=COALESCE(?, title), due_date=COALESCE(?, due_date) WHERE id=?",
+      [status, title, due_date, req.params.id],
+      (err) => {
+        if (err) return res.status(500).json({ message: "Database error", error: err });
+        res.json({ message: "Task updated" });
+      }
+    );
+  });
 });
 
 module.exports = router;
