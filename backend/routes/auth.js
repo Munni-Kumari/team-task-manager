@@ -31,6 +31,7 @@ router.post("/signup", async (req, res) => {
 
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
+  console.log("Login attempt for email:", email);
 
   db.query("SELECT * FROM users WHERE email = ?", [email], async (err, result) => {
     if (err) return res.status(500).json({ message: "Database error" });
